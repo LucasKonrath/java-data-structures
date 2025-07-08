@@ -1,3 +1,5 @@
+package recursion;
+
 public class TowerOfHanoi {
     public static void main(String[] args) {
         int n = 3; // Number of disks
