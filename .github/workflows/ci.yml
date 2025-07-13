@@ -106,59 +106,15 @@ jobs:
         reporter: java-junit
         fail-on-error: true
 
-  coverage-check:
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.event_name == 'pull_request'
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up JDK 11
-      uses: actions/setup-java@v4
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-
-    - name: Cache Maven dependencies
-      uses: actions/cache@v4
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2
-
-    - name: Download coverage reports
-      uses: actions/download-artifact@v4
-      with:
-        name: test-results-java-11
-        path: ./artifacts
-
-    - name: List downloaded files (debug)
-      run: |
-        echo "Contents of artifacts directory:"
-        find ./artifacts -type f -name "*.xml" | head -20
-        echo "Looking for jacoco files:"
-        find ./artifacts -name "*jacoco*" | head -10
-
-    - name: Move coverage report
-      run: |
-        mkdir -p ${{ github.workspace }}/target/site/jacoco
-        # Find and copy the jacoco.xml file wherever it is
-        find ./artifacts -name "jacoco.xml" -exec cp {} ${{ github.workspace }}/target/site/jacoco/ \;
-        # Also copy CSV file if it exists
-        find ./artifacts -name "jacoco.csv" -exec cp {} ${{ github.workspace }}/target/site/jacoco/ \; || true
-        echo "Coverage files moved successfully"
-        ls -la ${{ github.workspace }}/target/site/jacoco/
-
     - name: Run coverage check
       run: |
         mvn jacoco:check
         echo "Coverage thresholds enforced: 80% line coverage, 75% branch coverage"
+      if: matrix.java-version == '11'
 
     - name: Generate coverage badge
       uses: cicirello/jacoco-badge-generator@v2
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/main' && matrix.java-version == '11'
       with:
         generate-branches-badge: true
         jacoco-csv-file: target/site/jacoco/jacoco.csv
