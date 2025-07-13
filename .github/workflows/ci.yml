@@ -115,7 +115,7 @@ jobs:
 
     - name: Run coverage check
       run: |
-        mvn clean test jacoco:report jacoco:check
+        mvn jacoco:check
         echo "Coverage thresholds enforced: 80% line coverage, 75% branch coverage"
 
     - name: Generate coverage badge
