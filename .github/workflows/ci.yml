@@ -113,6 +113,12 @@ jobs:
         name: test-results-java-11
         path: ./
 
+    # After actions/download-artifact step
+    - name: Move coverage report
+      run: |
+        mkdir -p target/site/jacoco
+        mv ./test-results-java-11/jacoco.xml target/site/jacoco/jacoco.xml
+
     - name: Run coverage check
       run: |
         mvn jacoco:check
