@@ -111,13 +111,24 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: test-results-java-11
-        path: ./
+        path: ./artifacts
 
-    # After actions/download-artifact step
+    - name: List downloaded files (debug)
+      run: |
+        echo "Contents of artifacts directory:"
+        find ./artifacts -type f -name "*.xml" | head -20
+        echo "Looking for jacoco files:"
+        find ./artifacts -name "*jacoco*" | head -10
+
     - name: Move coverage report
       run: |
         mkdir -p target/site/jacoco
-        mv ./test-results-java-11/jacoco.xml target/site/jacoco/jacoco.xml
+        # Find and copy the jacoco.xml file wherever it is
+        find ./artifacts -name "jacoco.xml" -exec cp {} target/site/jacoco/ \;
+        # Also copy CSV file if it exists
+        find ./artifacts -name "jacoco.csv" -exec cp {} target/site/jacoco/ \; || true
+        echo "Coverage files moved successfully"
+        ls -la target/site/jacoco/
 
     - name: Run coverage check
       run: |
