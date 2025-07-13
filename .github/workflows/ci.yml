@@ -107,6 +107,12 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
 
+    - name: Download coverage reports
+      uses: actions/download-artifact@v4
+      with:
+        name: test-results-java-11
+        path: ./
+
     - name: Run coverage check
       run: |
         mvn clean test jacoco:report jacoco:check
