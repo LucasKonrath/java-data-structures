@@ -59,7 +59,7 @@ jobs:
       if: github.event_name == 'pull_request' && matrix.java-version == '11'
       with:
         paths: |
-          /home/runner/work/java-data-structures/java-data-structures/target/site/jacoco/jacoco.xml
+          target/site/jacoco/jacoco.xml
         token: ${{ secrets.GITHUB_TOKEN }}
         min-coverage-overall: 80
         min-coverage-changed-files: 75
@@ -70,7 +70,7 @@ jobs:
       uses: irongut/CodeCoverageSummary@v1.3.0
       if: github.event_name == 'pull_request' && matrix.java-version == '11'
       with:
-        filename: /home/runner/work/java-data-structures/java-data-structures/target/site/jacoco/jacoco.xml
+        filename: target/site/jacoco/jacoco.xml
         badge: true
         fail_below_min: true
         format: markdown
