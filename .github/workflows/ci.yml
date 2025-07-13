@@ -59,7 +59,7 @@ jobs:
       if: github.event_name == 'pull_request' && matrix.java-version == '11'
       with:
         paths: |
-          ./target/site/jacoco/jacoco.xml
+          /home/runner/work/java-data-structures/java-data-structures/target/site/jacoco/jacoco.xml
         token: ${{ secrets.GITHUB_TOKEN }}
         min-coverage-overall: 80
         min-coverage-changed-files: 75
