@@ -122,13 +122,13 @@ jobs:
 
     - name: Move coverage report
       run: |
-        mkdir -p target/site/jacoco
+        mkdir -p ${{ github.workspace }}/target/site/jacoco
         # Find and copy the jacoco.xml file wherever it is
-        find ./artifacts -name "jacoco.xml" -exec cp {} target/site/jacoco/ \;
+        find ./artifacts -name "jacoco.xml" -exec cp {} ${{ github.workspace }}/target/site/jacoco/ \;
         # Also copy CSV file if it exists
-        find ./artifacts -name "jacoco.csv" -exec cp {} target/site/jacoco/ \; || true
+        find ./artifacts -name "jacoco.csv" -exec cp {} ${{ github.workspace }}/target/site/jacoco/ \; || true
         echo "Coverage files moved successfully"
-        ls -la target/site/jacoco/
+        ls -la ${{ github.workspace }}/target/site/jacoco/
 
     - name: Run coverage check
       run: |
