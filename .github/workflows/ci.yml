@@ -52,6 +52,7 @@ jobs:
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}
 
     - name: Add coverage to PR
       id: jacoco
@@ -59,33 +60,13 @@ jobs:
       if: github.event_name == 'pull_request' && matrix.java-version == '11'
       with:
         paths: |
-          target/site/jacoco/jacoco.xml
+          ${{ github.workspace }}/target/site/jacoco/jacoco.xml
         token: ${{ secrets.GITHUB_TOKEN }}
         min-coverage-overall: 80
         min-coverage-changed-files: 75
         title: Code Coverage Report
         update-comment: true
-
-    - name: Coverage Summary
-      uses: irongut/CodeCoverageSummary@v1.3.0
-      if: github.event_name == 'pull_request' && matrix.java-version == '11'
-      with:
-        filename: target/site/jacoco/jacoco.xml
-        badge: true
-        fail_below_min: true
-        format: markdown
-        hide_branch_rate: false
-        hide_complexity: true
-        indicators: true
-        output: both
-        thresholds: '75 80'
-
-    - name: Add Coverage PR Comment
-      uses: marocchino/sticky-pull-request-comment@v2
-      if: github.event_name == 'pull_request' && matrix.java-version == '11'
-      with:
-        recreate: true
-        path: code-coverage-results.md
+        debug-mode: false
 
     - name: Upload test results
       uses: actions/upload-artifact@v4
