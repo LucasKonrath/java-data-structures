@@ -128,6 +128,9 @@
                 <configuration>
                     <excludes>
                         <exclude>**/Main.class</exclude>
+                        <exclude>**/jmh_generated/**</exclude>
+                        <exclude>**/*_jmhTest.class</exclude>
+                        <exclude>**/*_jmhType*.class</exclude>
                     </excludes>
                     <rules>
                         <rule>
