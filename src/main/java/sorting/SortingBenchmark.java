@@ -78,6 +78,12 @@ public class SortingBenchmark {
         shellSort.shellSort(arr);
     }
 
+    @Benchmark
+    public void quickSortSmall() {
+        int[] arr = smallArray.clone();
+        QuickSort.quickSort(arr, 0, arr.length - 1);
+    }
+
     // Medium Array Benchmarks (1,000 elements)
 
     @Benchmark
@@ -110,6 +116,12 @@ public class SortingBenchmark {
         shellSort.shellSort(arr);
     }
 
+    @Benchmark
+    public void quickSortMedium() {
+        int[] arr = mediumArray.clone();
+        QuickSort.quickSort(arr, 0, arr.length - 1);
+    }
+
     // Large Array Benchmarks (10,000 elements)
 
     @Benchmark
@@ -140,6 +152,12 @@ public class SortingBenchmark {
     public void shellSortLarge() {
         int[] arr = largeArray.clone();
         shellSort.shellSort(arr);
+    }
+
+    @Benchmark
+    public void quickSortLarge() {
+        int[] arr = largeArray.clone();
+        QuickSort.quickSort(arr, 0, arr.length - 1);
     }
 
     // Main method to run benchmarks directly
