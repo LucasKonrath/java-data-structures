@@ -1,56 +1,96 @@
 #!/bin/bash
 
-# Script to run JMH benchmarks for sorting algorithms
+# Script to run JMH benchmarks for data structure algorithms
+set -e
 
-echo "🚀 Running JMH Benchmarks for Sorting Algorithms"
-echo "================================================"
+echo "🚀 Data Structures Benchmark Runner"
 
 # Build the benchmark JAR if it doesn't exist or is outdated
 if [ ! -f target/benchmarks.jar ] || [ pom.xml -nt target/benchmarks.jar ]; then
     echo "📦 Building benchmark JAR..."
-    mvn clean package -DskipTests -q
+    mvn clean package -P jmh-benchmark -q
     if [ $? -ne 0 ]; then
         echo "❌ Failed to build benchmark JAR"
         exit 1
     fi
     echo "✅ Benchmark JAR built successfully"
+else
+    echo "📦 Using existing benchmark JAR"
 fi
 
 # Create results directory
-mkdir -p results
+mkdir -p benchmark-results
+TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 
-# Run benchmarks with JSON output
-echo "🏃 Running benchmarks..."
-echo "This may take several minutes depending on the number of iterations..."
+# Function to run benchmarks for a specific category
+run_benchmark() {
+    local category=$1
+    local pattern=$2
+    local description=$3
 
-java -jar target/benchmarks.jar \
-    -rf json \
-    -rff results/jmh-results-$(date +%Y%m%d-%H%M%S).json \
-    -wi 3 \
-    -i 5 \
-    -f 1 \
-    "$@"
+    echo ""
+    echo "🏃 Running $description..."
 
-if [ $? -eq 0 ]; then
-    echo "✅ Benchmarks completed successfully!"
-    echo "📊 Results saved in the results/ directory"
+    local result_file="benchmark-results/${category}_benchmark_${TIMESTAMP}.json"
 
-    # Find the most recent results file
-    LATEST_RESULT=$(ls -t results/jmh-results-*.json 2>/dev/null | head -n1)
+    java -jar target/benchmarks.jar \
+        -f 1 \
+        -wi 3 \
+        -i 5 \
+        -tu ns \
+        -rf json \
+        -rff "$result_file" \
+        "$pattern" 2>/dev/null
 
-    if [ -n "$LATEST_RESULT" ]; then
-        echo "📈 Latest results: $LATEST_RESULT"
+    if [ $? -eq 0 ] && [ -f "$result_file" ]; then
+        echo "✅ $description completed"
+        echo "📊 Results saved to: $result_file"
 
-        # Display a quick summary if jq is available
+        # Display top results
+        echo "📈 Top 5 fastest results:"
         if command -v jq >/dev/null 2>&1; then
-            echo ""
-            echo "🔍 Quick Summary (Top 5 fastest):"
-            echo "================================="
-            jq -r '.[] | "\(.benchmark | split(".") | .[-1]): \(.primaryMetric.score | tonumber | . * 1000 | round / 1000) \(.primaryMetric.scoreUnit)"' "$LATEST_RESULT" | \
-            sort -k2 -n | head -5 | nl
+            jq -r '.[] | "\(.benchmark | split(".") | .[-1]): \(.primaryMetric.score | tonumber | . / 1000 | round / 1000) μs"' "$result_file" | \
+            sort -k2 -n | head -5 | \
+            awk '{printf "   %s\n", $0}'
+        else
+            echo "   (Install 'jq' for formatted results)"
         fi
+    else
+        echo "❌ $description failed or no results generated"
     fi
-else
-    echo "❌ Benchmarks failed"
-    exit 1
-fi
+}
+
+# Main menu
+echo ""
+echo "Select benchmark to run:"
+echo "1) Sorting algorithms"
+echo "2) Searching algorithms"
+echo "3) All benchmarks"
+echo "4) Exit"
+
+read -p "Enter your choice (1-4): " choice
+
+case $choice in
+    1)
+        run_benchmark "sorting" ".*SortingBenchmark.*" "Sorting Algorithm Benchmarks"
+        ;;
+    2)
+        run_benchmark "searching" ".*SearchingBenchmark.*" "Searching Algorithm Benchmarks"
+        ;;
+    3)
+        run_benchmark "sorting" ".*SortingBenchmark.*" "Sorting Algorithm Benchmarks"
+        run_benchmark "searching" ".*SearchingBenchmark.*" "Searching Algorithm Benchmarks"
+        ;;
+    4)
+        echo "👋 Goodbye!"
+        exit 0
+        ;;
+    *)
+        echo "❌ Invalid choice. Please run the script again."
+        exit 1
+        ;;
+esac
+
+echo ""
+echo "🎉 Benchmark run completed!"
+echo "📁 All results are saved in the benchmark-results/ directory"
