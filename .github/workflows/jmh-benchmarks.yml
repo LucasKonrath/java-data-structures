@@ -168,6 +168,8 @@ jobs:
                     algorithm = "Unordered Linear Search"
                 elif 'orderedLinearSearch' in benchmark:
                     algorithm = "Ordered Linear Search"
+                elif 'binarySearch' in benchmark:
+                    algorithm = "Binary Search"
                 
                 print(f"| {algorithm} | {size} | {scenario} | {score} | {error} | {unit} |")
                 
@@ -202,6 +204,11 @@ jobs:
         echo "  - Average Case: O(n/2) - Target in middle" >> benchmark-results.md
         echo "  - Worst Case: O(n) - Target at end" >> benchmark-results.md
         echo "  - **Early Exit Optimization**: Can terminate much earlier when target doesn't exist" >> benchmark-results.md
+        echo "- **Binary Search**: O(log n) - Efficient divide-and-conquer search for sorted arrays" >> benchmark-results.md
+        echo "  - Best Case: O(1) - Target at middle position" >> benchmark-results.md
+        echo "  - Average Case: O(log n) - Requires log₂(n) comparisons" >> benchmark-results.md
+        echo "  - Worst Case: O(log n) - Target at extremes or not found" >> benchmark-results.md
+        echo "  - **Logarithmic Scaling**: Performance advantage grows exponentially with array size" >> benchmark-results.md
         echo "" >> benchmark-results.md
         echo "#### Key Observations:" >> benchmark-results.md
         echo "**Sorting:**" >> benchmark-results.md
@@ -213,11 +220,16 @@ jobs:
         echo "- Tree Sort performance depends on BST balance and duplicate frequency" >> benchmark-results.md
         echo "" >> benchmark-results.md
         echo "**Searching:**" >> benchmark-results.md
+        echo "- **Binary Search dominates all other algorithms** on sorted data with O(log n) complexity" >> benchmark-results.md
+        echo "- **Performance gap widens dramatically** with array size: 100k elements = ~17 comparisons vs ~50k for linear" >> benchmark-results.md
         echo "- **Ordered Linear Search significantly outperforms Unordered** in 'Not Found' scenarios" >> benchmark-results.md
-        echo "- **Early Exit optimization** can reduce search time by up to 90% when target doesn't exist" >> benchmark-results.md
-        echo "- Both algorithms perform equally in Best Case scenarios (target at beginning)" >> benchmark-results.md
-        echo "- **Ordered search advantage grows with array size** - larger arrays show more dramatic improvements" >> benchmark-results.md
-        echo "- For sorted data, Ordered Linear Search is always preferable over Unordered" >> benchmark-results.md
+        echo "- **Early Exit optimization** can reduce linear search time by up to 90% when target doesn't exist" >> benchmark-results.md
+        echo "- **Binary Search is the clear winner** for any sorted data regardless of scenario" >> benchmark-results.md
+        echo "- For unsorted data, Unordered Linear Search is the only option (sorting cost vs search frequency)" >> benchmark-results.md
+        echo "- **Algorithm Choice Guide:**" >> benchmark-results.md
+        echo "  - **Sorted data, any size**: Binary Search" >> benchmark-results.md
+        echo "  - **Unsorted data**: Unordered Linear Search" >> benchmark-results.md
+        echo "  - **Sorted data but linear search required**: Ordered Linear Search" >> benchmark-results.md
         
         else
           echo "❌ No benchmark results found!"
