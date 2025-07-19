@@ -42,6 +42,7 @@ public class SearchingBenchmark {
 
     private UnorderedLinearSearch unorderedLinearSearch;
     private OrderedLinearSearch orderedLinearSearch;
+    private BinarySearch binarySearch;
 
     @Setup(Level.Trial)
     public void setUp() {
@@ -53,7 +54,7 @@ public class SearchingBenchmark {
         largeArray = random.ints(LARGE_ARRAY_SIZE, 0, 10000).toArray();
         extraLargeArray = random.ints(EXTRA_LARGE_ARRAY_SIZE, 0, 10000).toArray();
 
-        // Create sorted versions for OrderedLinearSearch
+        // Create sorted versions for OrderedLinearSearch and BinarySearch
         smallSortedArray = smallArray.clone();
         mediumSortedArray = mediumArray.clone();
         largeSortedArray = largeArray.clone();
@@ -75,6 +76,7 @@ public class SearchingBenchmark {
 
         unorderedLinearSearch = new UnorderedLinearSearch();
         orderedLinearSearch = new OrderedLinearSearch();
+        binarySearch = new BinarySearch();
     }
 
     // Best Case Scenarios - target at the beginning
@@ -90,6 +92,12 @@ public class SearchingBenchmark {
     }
 
     @Benchmark
+    public int binarySearchSmallBestCase() {
+        // For binary search, best case is finding the element in the middle
+        return binarySearch.search(smallSortedArray, smallSortedArray[SMALL_ARRAY_SIZE / 2]);
+    }
+
+    @Benchmark
     public int unorderedLinearSearchMediumBestCase() {
         return unorderedLinearSearch.search(mediumArray, mediumArray[0]);
     }
@@ -97,6 +105,11 @@ public class SearchingBenchmark {
     @Benchmark
     public int orderedLinearSearchMediumBestCase() {
         return orderedLinearSearch.search(mediumSortedArray, mediumSortedArray[0]);
+    }
+
+    @Benchmark
+    public int binarySearchMediumBestCase() {
+        return binarySearch.search(mediumSortedArray, mediumSortedArray[MEDIUM_ARRAY_SIZE / 2]);
     }
 
     @Benchmark
@@ -110,6 +123,11 @@ public class SearchingBenchmark {
     }
 
     @Benchmark
+    public int binarySearchLargeBestCase() {
+        return binarySearch.search(largeSortedArray, largeSortedArray[LARGE_ARRAY_SIZE / 2]);
+    }
+
+    @Benchmark
     public int unorderedLinearSearchExtraLargeBestCase() {
         return unorderedLinearSearch.search(extraLargeArray, extraLargeArray[0]);
     }
@@ -117,6 +135,11 @@ public class SearchingBenchmark {
     @Benchmark
     public int orderedLinearSearchExtraLargeBestCase() {
         return orderedLinearSearch.search(extraLargeSortedArray, extraLargeSortedArray[0]);
+    }
+
+    @Benchmark
+    public int binarySearchExtraLargeBestCase() {
+        return binarySearch.search(extraLargeSortedArray, extraLargeSortedArray[EXTRA_LARGE_ARRAY_SIZE / 2]);
     }
 
     // Average Case Scenarios - target in the middle
@@ -132,6 +155,12 @@ public class SearchingBenchmark {
     }
 
     @Benchmark
+    public int binarySearchSmallAverageCase() {
+        // For binary search, we'll search for an element at 1/4 or 3/4 position for average case
+        return binarySearch.search(smallSortedArray, smallSortedArray[SMALL_ARRAY_SIZE / 4]);
+    }
+
+    @Benchmark
     public int unorderedLinearSearchMediumAverageCase() {
         return unorderedLinearSearch.search(mediumArray, targetMedium);
     }
@@ -139,6 +168,11 @@ public class SearchingBenchmark {
     @Benchmark
     public int orderedLinearSearchMediumAverageCase() {
         return orderedLinearSearch.search(mediumSortedArray, mediumSortedArray[MEDIUM_ARRAY_SIZE / 2]);
+    }
+
+    @Benchmark
+    public int binarySearchMediumAverageCase() {
+        return binarySearch.search(mediumSortedArray, mediumSortedArray[MEDIUM_ARRAY_SIZE / 4]);
     }
 
     @Benchmark
@@ -152,6 +186,11 @@ public class SearchingBenchmark {
     }
 
     @Benchmark
+    public int binarySearchLargeAverageCase() {
+        return binarySearch.search(largeSortedArray, largeSortedArray[LARGE_ARRAY_SIZE / 4]);
+    }
+
+    @Benchmark
     public int unorderedLinearSearchExtraLargeAverageCase() {
         return unorderedLinearSearch.search(extraLargeArray, targetExtraLarge);
     }
@@ -161,7 +200,12 @@ public class SearchingBenchmark {
         return orderedLinearSearch.search(extraLargeSortedArray, extraLargeSortedArray[EXTRA_LARGE_ARRAY_SIZE / 2]);
     }
 
-    // Worst Case Scenarios - target at the end (for unordered) or not found early exit (for ordered)
+    @Benchmark
+    public int binarySearchExtraLargeAverageCase() {
+        return binarySearch.search(extraLargeSortedArray, extraLargeSortedArray[EXTRA_LARGE_ARRAY_SIZE / 4]);
+    }
+
+    // Worst Case Scenarios
 
     @Benchmark
     public int unorderedLinearSearchSmallWorstCase() {
@@ -171,6 +215,12 @@ public class SearchingBenchmark {
     @Benchmark
     public int orderedLinearSearchSmallWorstCase() {
         return orderedLinearSearch.search(smallSortedArray, smallSortedArray[SMALL_ARRAY_SIZE - 1]);
+    }
+
+    @Benchmark
+    public int binarySearchSmallWorstCase() {
+        // For binary search, worst case is searching for first or last element
+        return binarySearch.search(smallSortedArray, smallSortedArray[0]);
     }
 
     @Benchmark
@@ -184,6 +234,11 @@ public class SearchingBenchmark {
     }
 
     @Benchmark
+    public int binarySearchMediumWorstCase() {
+        return binarySearch.search(mediumSortedArray, mediumSortedArray[0]);
+    }
+
+    @Benchmark
     public int unorderedLinearSearchLargeWorstCase() {
         return unorderedLinearSearch.search(largeArray, largeArray[LARGE_ARRAY_SIZE - 1]);
     }
@@ -194,6 +249,11 @@ public class SearchingBenchmark {
     }
 
     @Benchmark
+    public int binarySearchLargeWorstCase() {
+        return binarySearch.search(largeSortedArray, largeSortedArray[0]);
+    }
+
+    @Benchmark
     public int unorderedLinearSearchExtraLargeWorstCase() {
         return unorderedLinearSearch.search(extraLargeArray, extraLargeArray[EXTRA_LARGE_ARRAY_SIZE - 1]);
     }
@@ -201,6 +261,11 @@ public class SearchingBenchmark {
     @Benchmark
     public int orderedLinearSearchExtraLargeWorstCase() {
         return orderedLinearSearch.search(extraLargeSortedArray, extraLargeSortedArray[EXTRA_LARGE_ARRAY_SIZE - 1]);
+    }
+
+    @Benchmark
+    public int binarySearchExtraLargeWorstCase() {
+        return binarySearch.search(extraLargeSortedArray, extraLargeSortedArray[0]);
     }
 
     // Not Found Scenarios - element doesn't exist
@@ -216,6 +281,11 @@ public class SearchingBenchmark {
     }
 
     @Benchmark
+    public int binarySearchSmallNotFound() {
+        return binarySearch.search(smallSortedArray, notFoundTarget);
+    }
+
+    @Benchmark
     public int unorderedLinearSearchMediumNotFound() {
         return unorderedLinearSearch.search(mediumArray, notFoundTarget);
     }
@@ -223,6 +293,11 @@ public class SearchingBenchmark {
     @Benchmark
     public int orderedLinearSearchMediumNotFound() {
         return orderedLinearSearch.search(mediumSortedArray, notFoundTarget);
+    }
+
+    @Benchmark
+    public int binarySearchMediumNotFound() {
+        return binarySearch.search(mediumSortedArray, notFoundTarget);
     }
 
     @Benchmark
@@ -236,6 +311,11 @@ public class SearchingBenchmark {
     }
 
     @Benchmark
+    public int binarySearchLargeNotFound() {
+        return binarySearch.search(largeSortedArray, notFoundTarget);
+    }
+
+    @Benchmark
     public int unorderedLinearSearchExtraLargeNotFound() {
         return unorderedLinearSearch.search(extraLargeArray, notFoundTarget);
     }
@@ -245,7 +325,12 @@ public class SearchingBenchmark {
         return orderedLinearSearch.search(extraLargeSortedArray, notFoundTarget);
     }
 
-    // Early Exit Optimization Benchmarks - OrderedLinearSearch advantage
+    @Benchmark
+    public int binarySearchExtraLargeNotFound() {
+        return binarySearch.search(extraLargeSortedArray, notFoundTarget);
+    }
+
+    // Early Exit Optimization Benchmarks - OrderedLinearSearch and BinarySearch advantages
 
     @Benchmark
     public int orderedLinearSearchSmallEarlyExit() {
@@ -255,24 +340,46 @@ public class SearchingBenchmark {
     }
 
     @Benchmark
+    public int binarySearchSmallEarlyExit() {
+        // Target between first and second element
+        int target = (smallSortedArray[0] + smallSortedArray[1]) / 2;
+        return binarySearch.search(smallSortedArray, target);
+    }
+
+    @Benchmark
     public int orderedLinearSearchMediumEarlyExit() {
-        // Target between first and second element - should exit very early
         int target = (mediumSortedArray[0] + mediumSortedArray[1]) / 2;
         return orderedLinearSearch.search(mediumSortedArray, target);
     }
 
     @Benchmark
+    public int binarySearchMediumEarlyExit() {
+        int target = (mediumSortedArray[0] + mediumSortedArray[1]) / 2;
+        return binarySearch.search(mediumSortedArray, target);
+    }
+
+    @Benchmark
     public int orderedLinearSearchLargeEarlyExit() {
-        // Target between first and second element - should exit very early
         int target = (largeSortedArray[0] + largeSortedArray[1]) / 2;
         return orderedLinearSearch.search(largeSortedArray, target);
     }
 
     @Benchmark
+    public int binarySearchLargeEarlyExit() {
+        int target = (largeSortedArray[0] + largeSortedArray[1]) / 2;
+        return binarySearch.search(largeSortedArray, target);
+    }
+
+    @Benchmark
     public int orderedLinearSearchExtraLargeEarlyExit() {
-        // Target between first and second element - should exit very early
         int target = (extraLargeSortedArray[0] + extraLargeSortedArray[1]) / 2;
         return orderedLinearSearch.search(extraLargeSortedArray, target);
+    }
+
+    @Benchmark
+    public int binarySearchExtraLargeEarlyExit() {
+        int target = (extraLargeSortedArray[0] + extraLargeSortedArray[1]) / 2;
+        return binarySearch.search(extraLargeSortedArray, target);
     }
 
     public static void main(String[] args) throws RunnerException {
