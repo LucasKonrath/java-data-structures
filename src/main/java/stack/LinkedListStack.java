@@ -35,4 +35,11 @@ public class LinkedListStack {
     public int size() {
         return length;
     }
+
+    public int peek() {
+        if (isEmpty()) {
+            throw new IllegalStateException("Stack is empty");
+        }
+        return top.getData();
+    }
 }
