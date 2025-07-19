@@ -6,9 +6,6 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import tree.bst.BinarySearchTreeNode;
-import tree.avl.AvlTreeNode;
-
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -28,27 +25,14 @@ public class TreeBenchmark {
     private BinaryTreeNode mediumBinaryTree;
     private BinaryTreeNode largeBinaryTree;
 
-    private BinarySearchTreeNode smallBST;
-    private BinarySearchTreeNode mediumBST;
-    private BinarySearchTreeNode largeBST;
-
-    private AvlTreeNode smallAVL;
-    private AvlTreeNode mediumAVL;
-    private AvlTreeNode largeAVL;
-
     private int[] testData;
-    private int[] sortedData;
+    private int searchTarget;
 
     @Setup(Level.Trial)
     public void setUp() {
         Random random = new Random(42);
         testData = random.ints(LARGE_SIZE, 0, 10000).toArray();
-
-        // Create sorted data for worst-case scenarios
-        sortedData = new int[LARGE_SIZE];
-        for (int i = 0; i < LARGE_SIZE; i++) {
-            sortedData[i] = i;
-        }
+        searchTarget = testData[LARGE_SIZE / 2]; // Target for search operations
     }
 
     @Setup(Level.Invocation)
@@ -57,16 +41,6 @@ public class TreeBenchmark {
         smallBinaryTree = buildBinaryTree(SMALL_SIZE);
         mediumBinaryTree = buildBinaryTree(MEDIUM_SIZE);
         largeBinaryTree = buildBinaryTree(LARGE_SIZE);
-
-        // Build BSTs
-        smallBST = buildBST(SMALL_SIZE);
-        mediumBST = buildBST(MEDIUM_SIZE);
-        largeBST = buildBST(LARGE_SIZE);
-
-        // Build AVL Trees
-        smallAVL = buildAVL(SMALL_SIZE);
-        mediumAVL = buildAVL(MEDIUM_SIZE);
-        largeAVL = buildAVL(LARGE_SIZE);
     }
 
     private BinaryTreeNode buildBinaryTree(int size) {
@@ -97,182 +71,82 @@ public class TreeBenchmark {
         return root;
     }
 
-    private BinarySearchTreeNode buildBST(int size) {
-        BinarySearchTreeNode root = null;
-        for (int i = 0; i < size; i++) {
-            root = BinarySearchTreeNode.insert(root, testData[i]);
-        }
-        return root;
+    // Binary Tree Creation Benchmarks
+    @Benchmark
+    public BinaryTreeNode binaryTreeCreationSmall() {
+        return buildBinaryTree(SMALL_SIZE);
     }
 
-    private AvlTreeNode buildAVL(int size) {
-        AvlTreeNode root = null;
-        for (int i = 0; i < size; i++) {
-            root = AvlTreeNode.insert(root, testData[i]);
-        }
-        return root;
+    @Benchmark
+    public BinaryTreeNode binaryTreeCreationMedium() {
+        return buildBinaryTree(MEDIUM_SIZE);
+    }
+
+    @Benchmark
+    public BinaryTreeNode binaryTreeCreationLarge() {
+        return buildBinaryTree(LARGE_SIZE);
     }
 
     // Binary Tree Traversal Benchmarks
     @Benchmark
-    public void binaryTreeInorderTraversalSmall() {
-        inorderTraversal(smallBinaryTree);
+    public int binaryTreeInorderTraversalSmall() {
+        return inorderTraversal(smallBinaryTree);
     }
 
     @Benchmark
-    public void binaryTreeInorderTraversalMedium() {
-        inorderTraversal(mediumBinaryTree);
+    public int binaryTreeInorderTraversalMedium() {
+        return inorderTraversal(mediumBinaryTree);
     }
 
     @Benchmark
-    public void binaryTreeInorderTraversalLarge() {
-        inorderTraversal(largeBinaryTree);
+    public int binaryTreeInorderTraversalLarge() {
+        return inorderTraversal(largeBinaryTree);
     }
 
     @Benchmark
-    public void binaryTreePreorderTraversalSmall() {
-        preorderTraversal(smallBinaryTree);
+    public int binaryTreePreorderTraversalSmall() {
+        return preorderTraversal(smallBinaryTree);
     }
 
     @Benchmark
-    public void binaryTreePreorderTraversalMedium() {
-        preorderTraversal(mediumBinaryTree);
+    public int binaryTreePreorderTraversalMedium() {
+        return preorderTraversal(mediumBinaryTree);
     }
 
     @Benchmark
-    public void binaryTreePreorderTraversalLarge() {
-        preorderTraversal(largeBinaryTree);
+    public int binaryTreePreorderTraversalLarge() {
+        return preorderTraversal(largeBinaryTree);
     }
 
     @Benchmark
-    public void binaryTreePostorderTraversalSmall() {
-        postorderTraversal(smallBinaryTree);
+    public int binaryTreePostorderTraversalSmall() {
+        return postorderTraversal(smallBinaryTree);
     }
 
     @Benchmark
-    public void binaryTreePostorderTraversalMedium() {
-        postorderTraversal(mediumBinaryTree);
+    public int binaryTreePostorderTraversalMedium() {
+        return postorderTraversal(mediumBinaryTree);
     }
 
     @Benchmark
-    public void binaryTreePostorderTraversalLarge() {
-        postorderTraversal(largeBinaryTree);
+    public int binaryTreePostorderTraversalLarge() {
+        return postorderTraversal(largeBinaryTree);
     }
 
-    // BST Search Benchmarks
+    // Binary Tree Search Benchmarks (Linear search through tree)
     @Benchmark
-    public boolean bstSearchSmall() {
-        return BinarySearchTreeNode.search(smallBST, testData[SMALL_SIZE / 2]);
-    }
-
-    @Benchmark
-    public boolean bstSearchMedium() {
-        return BinarySearchTreeNode.search(mediumBST, testData[MEDIUM_SIZE / 2]);
+    public boolean binaryTreeSearchSmall() {
+        return searchInTree(smallBinaryTree, searchTarget);
     }
 
     @Benchmark
-    public boolean bstSearchLarge() {
-        return BinarySearchTreeNode.search(largeBST, testData[LARGE_SIZE / 2]);
-    }
-
-    // BST Insertion Benchmarks
-    @Benchmark
-    public void bstInsertionSmall() {
-        BinarySearchTreeNode root = null;
-        for (int i = 0; i < SMALL_SIZE; i++) {
-            root = BinarySearchTreeNode.insert(root, testData[i]);
-        }
+    public boolean binaryTreeSearchMedium() {
+        return searchInTree(mediumBinaryTree, searchTarget);
     }
 
     @Benchmark
-    public void bstInsertionMedium() {
-        BinarySearchTreeNode root = null;
-        for (int i = 0; i < MEDIUM_SIZE; i++) {
-            root = BinarySearchTreeNode.insert(root, testData[i]);
-        }
-    }
-
-    @Benchmark
-    public void bstInsertionLarge() {
-        BinarySearchTreeNode root = null;
-        for (int i = 0; i < LARGE_SIZE; i++) {
-            root = BinarySearchTreeNode.insert(root, testData[i]);
-        }
-    }
-
-    // BST Worst Case (Sorted Data) Benchmarks
-    @Benchmark
-    public void bstWorstCaseInsertionSmall() {
-        BinarySearchTreeNode root = null;
-        for (int i = 0; i < SMALL_SIZE; i++) {
-            root = BinarySearchTreeNode.insert(root, sortedData[i]);
-        }
-    }
-
-    @Benchmark
-    public void bstWorstCaseInsertionMedium() {
-        BinarySearchTreeNode root = null;
-        for (int i = 0; i < MEDIUM_SIZE; i++) {
-            root = BinarySearchTreeNode.insert(root, sortedData[i]);
-        }
-    }
-
-    // AVL Tree Search Benchmarks
-    @Benchmark
-    public boolean avlSearchSmall() {
-        return AvlTreeNode.search(smallAVL, testData[SMALL_SIZE / 2]);
-    }
-
-    @Benchmark
-    public boolean avlSearchMedium() {
-        return AvlTreeNode.search(mediumAVL, testData[MEDIUM_SIZE / 2]);
-    }
-
-    @Benchmark
-    public boolean avlSearchLarge() {
-        return AvlTreeNode.search(largeAVL, testData[LARGE_SIZE / 2]);
-    }
-
-    // AVL Tree Insertion Benchmarks
-    @Benchmark
-    public void avlInsertionSmall() {
-        AvlTreeNode root = null;
-        for (int i = 0; i < SMALL_SIZE; i++) {
-            root = AvlTreeNode.insert(root, testData[i]);
-        }
-    }
-
-    @Benchmark
-    public void avlInsertionMedium() {
-        AvlTreeNode root = null;
-        for (int i = 0; i < MEDIUM_SIZE; i++) {
-            root = AvlTreeNode.insert(root, testData[i]);
-        }
-    }
-
-    @Benchmark
-    public void avlInsertionLarge() {
-        AvlTreeNode root = null;
-        for (int i = 0; i < LARGE_SIZE; i++) {
-            root = AvlTreeNode.insert(root, testData[i]);
-        }
-    }
-
-    // AVL Tree Worst Case (Sorted Data) Benchmarks
-    @Benchmark
-    public void avlWorstCaseInsertionSmall() {
-        AvlTreeNode root = null;
-        for (int i = 0; i < SMALL_SIZE; i++) {
-            root = AvlTreeNode.insert(root, sortedData[i]);
-        }
-    }
-
-    @Benchmark
-    public void avlWorstCaseInsertionMedium() {
-        AvlTreeNode root = null;
-        for (int i = 0; i < MEDIUM_SIZE; i++) {
-            root = AvlTreeNode.insert(root, sortedData[i]);
-        }
+    public boolean binaryTreeSearchLarge() {
+        return searchInTree(largeBinaryTree, searchTarget);
     }
 
     // Tree Height Calculation Benchmarks
@@ -291,34 +165,61 @@ public class TreeBenchmark {
         return calculateHeight(largeBinaryTree);
     }
 
-    // Helper methods for traversals
-    private void inorderTraversal(BinaryTreeNode node) {
-        if (node != null) {
-            inorderTraversal(node.getLeft());
-            node.getVal(); // Process node
-            inorderTraversal(node.getRight());
-        }
+    // Tree Node Count Benchmarks
+    @Benchmark
+    public int binaryTreeNodeCountSmall() {
+        return countNodes(smallBinaryTree);
     }
 
-    private void preorderTraversal(BinaryTreeNode node) {
-        if (node != null) {
-            node.getVal(); // Process node
-            preorderTraversal(node.getLeft());
-            preorderTraversal(node.getRight());
-        }
+    @Benchmark
+    public int binaryTreeNodeCountMedium() {
+        return countNodes(mediumBinaryTree);
     }
 
-    private void postorderTraversal(BinaryTreeNode node) {
-        if (node != null) {
-            postorderTraversal(node.getLeft());
-            postorderTraversal(node.getRight());
-            node.getVal(); // Process node
-        }
+    @Benchmark
+    public int binaryTreeNodeCountLarge() {
+        return countNodes(largeBinaryTree);
+    }
+
+    // Helper methods for traversals (return count to avoid dead code elimination)
+    private int inorderTraversal(BinaryTreeNode node) {
+        if (node == null) return 0;
+        int count = 1;
+        count += inorderTraversal(node.getLeft());
+        count += inorderTraversal(node.getRight());
+        return count;
+    }
+
+    private int preorderTraversal(BinaryTreeNode node) {
+        if (node == null) return 0;
+        int count = 1;
+        count += preorderTraversal(node.getLeft());
+        count += preorderTraversal(node.getRight());
+        return count;
+    }
+
+    private int postorderTraversal(BinaryTreeNode node) {
+        if (node == null) return 0;
+        int count = 1;
+        count += postorderTraversal(node.getLeft());
+        count += postorderTraversal(node.getRight());
+        return count;
+    }
+
+    private boolean searchInTree(BinaryTreeNode node, int target) {
+        if (node == null) return false;
+        if (node.getVal() == target) return true;
+        return searchInTree(node.getLeft(), target) || searchInTree(node.getRight(), target);
     }
 
     private int calculateHeight(BinaryTreeNode node) {
         if (node == null) return -1;
         return 1 + Math.max(calculateHeight(node.getLeft()), calculateHeight(node.getRight()));
+    }
+
+    private int countNodes(BinaryTreeNode node) {
+        if (node == null) return 0;
+        return 1 + countNodes(node.getLeft()) + countNodes(node.getRight());
     }
 
     public static void main(String[] args) throws RunnerException {

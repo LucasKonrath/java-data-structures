@@ -162,32 +162,32 @@ public class HeapBenchmark {
 
     @Benchmark
     public int minHeapExtractionSmall() {
-        return smallMinHeap.extractMin();
+        return smallMinHeap.getMin();
     }
 
     @Benchmark
     public int minHeapExtractionMedium() {
-        return mediumMinHeap.extractMin();
+        return mediumMinHeap.getMin();
     }
 
     @Benchmark
     public int minHeapExtractionLarge() {
-        return largeMinHeap.extractMin();
+        return largeMinHeap.getMin();
     }
 
     @Benchmark
     public int maxHeapExtractionSmall() {
-        return smallMaxHeap.extractMax();
+        return smallMaxHeap.getMax();
     }
 
     @Benchmark
     public int maxHeapExtractionMedium() {
-        return mediumMaxHeap.extractMax();
+        return mediumMaxHeap.getMax();
     }
 
     @Benchmark
     public int maxHeapExtractionLarge() {
-        return largeMaxHeap.extractMax();
+        return largeMaxHeap.getMax();
     }
 
     // Heap Peek Operations
