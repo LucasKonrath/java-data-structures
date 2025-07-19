@@ -27,6 +27,12 @@ public class SearchingBenchmark {
     private int[] largeArray;
     private int[] extraLargeArray;
 
+    // Sorted arrays for OrderedLinearSearch
+    private int[] smallSortedArray;
+    private int[] mediumSortedArray;
+    private int[] largeSortedArray;
+    private int[] extraLargeSortedArray;
+
     private int targetSmall;
     private int targetMedium;
     private int targetLarge;
@@ -35,6 +41,7 @@ public class SearchingBenchmark {
     private int notFoundTarget;
 
     private UnorderedLinearSearch unorderedLinearSearch;
+    private OrderedLinearSearch orderedLinearSearch;
 
     @Setup(Level.Trial)
     public void setUp() {
@@ -46,6 +53,17 @@ public class SearchingBenchmark {
         largeArray = random.ints(LARGE_ARRAY_SIZE, 0, 10000).toArray();
         extraLargeArray = random.ints(EXTRA_LARGE_ARRAY_SIZE, 0, 10000).toArray();
 
+        // Create sorted versions for OrderedLinearSearch
+        smallSortedArray = smallArray.clone();
+        mediumSortedArray = mediumArray.clone();
+        largeSortedArray = largeArray.clone();
+        extraLargeSortedArray = extraLargeArray.clone();
+
+        java.util.Arrays.sort(smallSortedArray);
+        java.util.Arrays.sort(mediumSortedArray);
+        java.util.Arrays.sort(largeSortedArray);
+        java.util.Arrays.sort(extraLargeSortedArray);
+
         // Select targets that exist in the arrays (middle position for average case)
         targetSmall = smallArray[SMALL_ARRAY_SIZE / 2];
         targetMedium = mediumArray[MEDIUM_ARRAY_SIZE / 2];
@@ -56,6 +74,7 @@ public class SearchingBenchmark {
         notFoundTarget = -1;
 
         unorderedLinearSearch = new UnorderedLinearSearch();
+        orderedLinearSearch = new OrderedLinearSearch();
     }
 
     // Best Case Scenarios - target at the beginning
@@ -66,8 +85,18 @@ public class SearchingBenchmark {
     }
 
     @Benchmark
+    public int orderedLinearSearchSmallBestCase() {
+        return orderedLinearSearch.search(smallSortedArray, smallSortedArray[0]);
+    }
+
+    @Benchmark
     public int unorderedLinearSearchMediumBestCase() {
         return unorderedLinearSearch.search(mediumArray, mediumArray[0]);
+    }
+
+    @Benchmark
+    public int orderedLinearSearchMediumBestCase() {
+        return orderedLinearSearch.search(mediumSortedArray, mediumSortedArray[0]);
     }
 
     @Benchmark
@@ -76,8 +105,18 @@ public class SearchingBenchmark {
     }
 
     @Benchmark
+    public int orderedLinearSearchLargeBestCase() {
+        return orderedLinearSearch.search(largeSortedArray, largeSortedArray[0]);
+    }
+
+    @Benchmark
     public int unorderedLinearSearchExtraLargeBestCase() {
         return unorderedLinearSearch.search(extraLargeArray, extraLargeArray[0]);
+    }
+
+    @Benchmark
+    public int orderedLinearSearchExtraLargeBestCase() {
+        return orderedLinearSearch.search(extraLargeSortedArray, extraLargeSortedArray[0]);
     }
 
     // Average Case Scenarios - target in the middle
@@ -88,8 +127,18 @@ public class SearchingBenchmark {
     }
 
     @Benchmark
+    public int orderedLinearSearchSmallAverageCase() {
+        return orderedLinearSearch.search(smallSortedArray, smallSortedArray[SMALL_ARRAY_SIZE / 2]);
+    }
+
+    @Benchmark
     public int unorderedLinearSearchMediumAverageCase() {
         return unorderedLinearSearch.search(mediumArray, targetMedium);
+    }
+
+    @Benchmark
+    public int orderedLinearSearchMediumAverageCase() {
+        return orderedLinearSearch.search(mediumSortedArray, mediumSortedArray[MEDIUM_ARRAY_SIZE / 2]);
     }
 
     @Benchmark
@@ -98,15 +147,30 @@ public class SearchingBenchmark {
     }
 
     @Benchmark
+    public int orderedLinearSearchLargeAverageCase() {
+        return orderedLinearSearch.search(largeSortedArray, largeSortedArray[LARGE_ARRAY_SIZE / 2]);
+    }
+
+    @Benchmark
     public int unorderedLinearSearchExtraLargeAverageCase() {
         return unorderedLinearSearch.search(extraLargeArray, targetExtraLarge);
     }
 
-    // Worst Case Scenarios - target at the end
+    @Benchmark
+    public int orderedLinearSearchExtraLargeAverageCase() {
+        return orderedLinearSearch.search(extraLargeSortedArray, extraLargeSortedArray[EXTRA_LARGE_ARRAY_SIZE / 2]);
+    }
+
+    // Worst Case Scenarios - target at the end (for unordered) or not found early exit (for ordered)
 
     @Benchmark
     public int unorderedLinearSearchSmallWorstCase() {
         return unorderedLinearSearch.search(smallArray, smallArray[SMALL_ARRAY_SIZE - 1]);
+    }
+
+    @Benchmark
+    public int orderedLinearSearchSmallWorstCase() {
+        return orderedLinearSearch.search(smallSortedArray, smallSortedArray[SMALL_ARRAY_SIZE - 1]);
     }
 
     @Benchmark
@@ -115,8 +179,18 @@ public class SearchingBenchmark {
     }
 
     @Benchmark
+    public int orderedLinearSearchMediumWorstCase() {
+        return orderedLinearSearch.search(mediumSortedArray, mediumSortedArray[MEDIUM_ARRAY_SIZE - 1]);
+    }
+
+    @Benchmark
     public int unorderedLinearSearchLargeWorstCase() {
         return unorderedLinearSearch.search(largeArray, largeArray[LARGE_ARRAY_SIZE - 1]);
+    }
+
+    @Benchmark
+    public int orderedLinearSearchLargeWorstCase() {
+        return orderedLinearSearch.search(largeSortedArray, largeSortedArray[LARGE_ARRAY_SIZE - 1]);
     }
 
     @Benchmark
@@ -124,11 +198,21 @@ public class SearchingBenchmark {
         return unorderedLinearSearch.search(extraLargeArray, extraLargeArray[EXTRA_LARGE_ARRAY_SIZE - 1]);
     }
 
-    // Not Found Scenarios - element doesn't exist (absolute worst case)
+    @Benchmark
+    public int orderedLinearSearchExtraLargeWorstCase() {
+        return orderedLinearSearch.search(extraLargeSortedArray, extraLargeSortedArray[EXTRA_LARGE_ARRAY_SIZE - 1]);
+    }
+
+    // Not Found Scenarios - element doesn't exist
 
     @Benchmark
     public int unorderedLinearSearchSmallNotFound() {
         return unorderedLinearSearch.search(smallArray, notFoundTarget);
+    }
+
+    @Benchmark
+    public int orderedLinearSearchSmallNotFound() {
+        return orderedLinearSearch.search(smallSortedArray, notFoundTarget);
     }
 
     @Benchmark
@@ -137,13 +221,58 @@ public class SearchingBenchmark {
     }
 
     @Benchmark
+    public int orderedLinearSearchMediumNotFound() {
+        return orderedLinearSearch.search(mediumSortedArray, notFoundTarget);
+    }
+
+    @Benchmark
     public int unorderedLinearSearchLargeNotFound() {
         return unorderedLinearSearch.search(largeArray, notFoundTarget);
     }
 
     @Benchmark
+    public int orderedLinearSearchLargeNotFound() {
+        return orderedLinearSearch.search(largeSortedArray, notFoundTarget);
+    }
+
+    @Benchmark
     public int unorderedLinearSearchExtraLargeNotFound() {
         return unorderedLinearSearch.search(extraLargeArray, notFoundTarget);
+    }
+
+    @Benchmark
+    public int orderedLinearSearchExtraLargeNotFound() {
+        return orderedLinearSearch.search(extraLargeSortedArray, notFoundTarget);
+    }
+
+    // Early Exit Optimization Benchmarks - OrderedLinearSearch advantage
+
+    @Benchmark
+    public int orderedLinearSearchSmallEarlyExit() {
+        // Target between first and second element - should exit very early
+        int target = (smallSortedArray[0] + smallSortedArray[1]) / 2;
+        return orderedLinearSearch.search(smallSortedArray, target);
+    }
+
+    @Benchmark
+    public int orderedLinearSearchMediumEarlyExit() {
+        // Target between first and second element - should exit very early
+        int target = (mediumSortedArray[0] + mediumSortedArray[1]) / 2;
+        return orderedLinearSearch.search(mediumSortedArray, target);
+    }
+
+    @Benchmark
+    public int orderedLinearSearchLargeEarlyExit() {
+        // Target between first and second element - should exit very early
+        int target = (largeSortedArray[0] + largeSortedArray[1]) / 2;
+        return orderedLinearSearch.search(largeSortedArray, target);
+    }
+
+    @Benchmark
+    public int orderedLinearSearchExtraLargeEarlyExit() {
+        // Target between first and second element - should exit very early
+        int target = (extraLargeSortedArray[0] + extraLargeSortedArray[1]) / 2;
+        return orderedLinearSearch.search(extraLargeSortedArray, target);
     }
 
     public static void main(String[] args) throws RunnerException {
