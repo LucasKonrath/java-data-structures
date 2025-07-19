@@ -110,11 +110,16 @@ jobs:
         echo "- **Selection Sort**: O(n²) - Consistent performance regardless of input order" >> benchmark-results.md
         echo "- **Merge Sort**: O(n log n) - Consistent performance, stable sort" >> benchmark-results.md
         echo "- **Shell Sort**: O(n log n) to O(n²) - Gap-based insertion sort variant" >> benchmark-results.md
+        echo "- **Quick Sort**: O(n log n) average, O(n²) worst - Fast divide-and-conquer algorithm" >> benchmark-results.md
+        echo "- **Tree Sort**: O(n log n) average, O(n²) worst - BST-based sorting with duplicate handling" >> benchmark-results.md
+        echo "- **Counting Sort**: O(n + k) - Linear time for limited range integers (k = range)" >> benchmark-results.md
         echo "" >> benchmark-results.md
         echo "**Key Observations:**" >> benchmark-results.md
-        echo "- Merge Sort should perform best on large datasets due to O(n log n) complexity" >> benchmark-results.md
+        echo "- Counting Sort should be fastest for arrays with small integer ranges" >> benchmark-results.md
+        echo "- Merge Sort and Quick Sort should perform best on large datasets due to O(n log n) complexity" >> benchmark-results.md
         echo "- Insertion Sort may outperform others on small, nearly-sorted datasets" >> benchmark-results.md
         echo "- Bubble Sort typically shows the worst performance on random data" >> benchmark-results.md
+        echo "- Tree Sort performance depends on BST balance and duplicate frequency" >> benchmark-results.md
 
     - name: Display Results
       run: cat benchmark-results.md

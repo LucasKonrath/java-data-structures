@@ -31,6 +31,7 @@ public class SortingBenchmark {
     private MergeSort mergeSort;
     private ShellSort shellSort;
     private TreeSort treeSort;
+    private CountingSort countingSort;
 
     @Setup(Level.Trial)
     public void setUp() {
@@ -46,6 +47,7 @@ public class SortingBenchmark {
         mergeSort = new MergeSort();
         shellSort = new ShellSort();
         treeSort = new TreeSort();
+        countingSort = new CountingSort();
     }
 
     // Small Array Benchmarks (100 elements)
@@ -92,6 +94,12 @@ public class SortingBenchmark {
         treeSort.treeSort(arr);
     }
 
+    @Benchmark
+    public void countingSortSmall() {
+        int[] arr = smallArray.clone();
+        countingSort.countingSort(arr);
+    }
+
     // Medium Array Benchmarks (1,000 elements)
 
     @Benchmark
@@ -134,6 +142,12 @@ public class SortingBenchmark {
     public void treeSortMedium() {
         int[] arr = mediumArray.clone();
         treeSort.treeSort(arr);
+    }
+
+    @Benchmark
+    public void countingSortMedium() {
+        int[] arr = mediumArray.clone();
+        countingSort.countingSort(arr);
     }
 
     // Large Array Benchmarks (10,000 elements)
@@ -179,6 +193,12 @@ public class SortingBenchmark {
         int[] arr = largeArray.clone();
         treeSort.treeSort(arr);
     }
+
+    @Benchmark
+    public void countingSortLarge() {
+        int[] arr = largeArray.clone();
+        countingSort.countingSort(arr);
+    }
     // Main method to run benchmarks directly
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
@@ -188,4 +208,3 @@ public class SortingBenchmark {
         new Runner(opt).run();
     }
 }
-
