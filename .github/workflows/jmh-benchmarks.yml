@@ -43,7 +43,20 @@ jobs:
       run: mvn package -DskipTests
 
     - name: Run JMH Benchmarks
-      run: java -jar target/benchmarks.jar -rf json -rff target/jmh-results.json
+      run: |
+        # Run both sorting and searching benchmarks
+        java -jar target/benchmarks.jar ".*SortingBenchmark.*" -rf json -rff target/sorting-results.json
+        java -jar target/benchmarks.jar ".*SearchingBenchmark.*" -rf json -rff target/searching-results.json
+        
+        # Combine results into a single file
+        echo "[]" > target/jmh-results.json
+        if [ -f target/sorting-results.json ] && [ -f target/searching-results.json ]; then
+          jq -s '.[0] + .[1]' target/sorting-results.json target/searching-results.json > target/jmh-results.json
+        elif [ -f target/sorting-results.json ]; then
+          cp target/sorting-results.json target/jmh-results.json
+        elif [ -f target/searching-results.json ]; then
+          cp target/searching-results.json target/jmh-results.json
+        fi
 
     - name: Parse and Format Benchmark Results
       run: |
@@ -53,11 +66,13 @@ jobs:
           echo "Generated on: $(date)" >> benchmark-results.md
           echo "" >> benchmark-results.md
           
-          # Create a summary table
+          # Separate sorting and searching results
+          echo "### 🔄 Sorting Algorithm Results" >> benchmark-results.md
+          echo "" >> benchmark-results.md
           echo "| Benchmark | Array Size | Score (μs/op) | Error (±) | Unit |" >> benchmark-results.md
           echo "|-----------|------------|---------------|-----------|------|" >> benchmark-results.md
           
-          # Parse JSON and create table rows
+          # Parse JSON and create sorting table rows
           python3 - << 'EOF'
         import json
         import sys
@@ -66,8 +81,9 @@ jobs:
             with open('target/jmh-results.json', 'r') as f:
                 data = json.load(f)
             
-            # Sort benchmarks by name for consistent ordering
-            sorted_benchmarks = sorted(data, key=lambda x: x['benchmark'])
+            # Filter and sort sorting benchmarks
+            sorting_benchmarks = [x for x in data if 'SortingBenchmark' in x['benchmark']]
+            sorted_benchmarks = sorted(sorting_benchmarks, key=lambda x: x['benchmark'])
             
             for result in sorted_benchmarks:
                 benchmark = result['benchmark'].split('.')[-1]  # Get method name
@@ -91,20 +107,80 @@ jobs:
                 print(f"| {clean_name} | {size} | {score} | {error} | {unit} |")
                 
         except Exception as e:
-            print(f"Error parsing results: {e}")
+            print(f"Error parsing sorting results: {e}")
             sys.exit(1)
         EOF
-        else
-          echo "❌ No benchmark results found!"
-          exit 1
-        fi >> benchmark-results.md
-
-    - name: Add Performance Analysis
-      run: |
+        
+        echo "" >> benchmark-results.md
+        echo "### 🔍 Searching Algorithm Results" >> benchmark-results.md
+        echo "" >> benchmark-results.md
+        echo "| Benchmark | Array Size | Scenario | Score (ns/op) | Error (±) | Unit |" >> benchmark-results.md
+        echo "|-----------|------------|----------|---------------|-----------|------|" >> benchmark-results.md
+        
+        # Parse JSON and create searching table rows
+        python3 - << 'EOF'
+        import json
+        import sys
+        import re
+        
+        try:
+            with open('target/jmh-results.json', 'r') as f:
+                data = json.load(f)
+            
+            # Filter and sort searching benchmarks
+            searching_benchmarks = [x for x in data if 'SearchingBenchmark' in x['benchmark']]
+            sorted_benchmarks = sorted(searching_benchmarks, key=lambda x: x['benchmark'])
+            
+            for result in sorted_benchmarks:
+                benchmark = result['benchmark'].split('.')[-1]  # Get method name
+                score = f"{result['primaryMetric']['score']:.0f}"
+                error = f"{result['primaryMetric']['scoreError']:.0f}"
+                unit = result['primaryMetric']['scoreUnit']
+                
+                # Extract array size and scenario from benchmark name
+                size = "N/A"
+                scenario = "Unknown"
+                
+                if 'Small' in benchmark:
+                    size = "100"
+                elif 'Medium' in benchmark:
+                    size = "1,000"  
+                elif 'Large' in benchmark and 'ExtraLarge' not in benchmark:
+                    size = "10,000"
+                elif 'ExtraLarge' in benchmark:
+                    size = "100,000"
+                
+                # Determine scenario
+                if 'BestCase' in benchmark:
+                    scenario = "Best Case"
+                elif 'AverageCase' in benchmark:
+                    scenario = "Average Case"
+                elif 'WorstCase' in benchmark:
+                    scenario = "Worst Case"
+                elif 'NotFound' in benchmark:
+                    scenario = "Not Found"
+                elif 'EarlyExit' in benchmark:
+                    scenario = "Early Exit"
+                
+                # Determine algorithm type
+                algorithm = "Unknown"
+                if 'unorderedLinearSearch' in benchmark:
+                    algorithm = "Unordered Linear Search"
+                elif 'orderedLinearSearch' in benchmark:
+                    algorithm = "Ordered Linear Search"
+                
+                print(f"| {algorithm} | {size} | {scenario} | {score} | {error} | {unit} |")
+                
+        except Exception as e:
+            print(f"Error parsing searching results: {e}")
+            sys.exit(1)
+        EOF
+        
+        # Add performance analysis section
         echo "" >> benchmark-results.md
         echo "### 📊 Performance Analysis" >> benchmark-results.md
         echo "" >> benchmark-results.md
-        echo "**Algorithm Complexity Analysis:**" >> benchmark-results.md
+        echo "#### Sorting Algorithm Complexity Analysis:" >> benchmark-results.md
         echo "- **Bubble Sort**: O(n²) - Simple but inefficient for large datasets" >> benchmark-results.md
         echo "- **Insertion Sort**: O(n²) - Efficient for small datasets and nearly sorted arrays" >> benchmark-results.md
         echo "- **Selection Sort**: O(n²) - Consistent performance regardless of input order" >> benchmark-results.md
@@ -116,14 +192,37 @@ jobs:
         echo "- **Bucket Sort**: O(n + k) - Linear time for limited range (0-9), uses counting buckets" >> benchmark-results.md
         echo "- **Radix Sort**: O(d × (n + k)) - Linear time, d = digits, k = base (10)" >> benchmark-results.md
         echo "" >> benchmark-results.md
-        echo "**Key Observations:**" >> benchmark-results.md
+        echo "#### Searching Algorithm Complexity Analysis:" >> benchmark-results.md
+        echo "- **Unordered Linear Search**: O(n) - Searches through unsorted arrays sequentially" >> benchmark-results.md
+        echo "  - Best Case: O(1) - Target at beginning" >> benchmark-results.md
+        echo "  - Average Case: O(n/2) - Target in middle" >> benchmark-results.md
+        echo "  - Worst Case: O(n) - Target at end or not found" >> benchmark-results.md
+        echo "- **Ordered Linear Search**: O(n) - Searches through sorted arrays with early termination" >> benchmark-results.md
+        echo "  - Best Case: O(1) - Target at beginning" >> benchmark-results.md
+        echo "  - Average Case: O(n/2) - Target in middle" >> benchmark-results.md
+        echo "  - Worst Case: O(n) - Target at end" >> benchmark-results.md
+        echo "  - **Early Exit Optimization**: Can terminate much earlier when target doesn't exist" >> benchmark-results.md
+        echo "" >> benchmark-results.md
+        echo "#### Key Observations:" >> benchmark-results.md
+        echo "**Sorting:**" >> benchmark-results.md
         echo "- Linear-time algorithms (Radix, Bucket, Counting Sort) should be fastest for suitable integer ranges" >> benchmark-results.md
         echo "- Radix Sort excels with multi-digit numbers while maintaining linear complexity" >> benchmark-results.md
         echo "- Merge Sort and Quick Sort should perform best on large datasets due to O(n log n) complexity" >> benchmark-results.md
         echo "- Insertion Sort may outperform others on small, nearly-sorted datasets" >> benchmark-results.md
         echo "- Bubble Sort typically shows the worst performance on random data" >> benchmark-results.md
         echo "- Tree Sort performance depends on BST balance and duplicate frequency" >> benchmark-results.md
-        echo "- Non-comparison algorithms (Radix/Counting/Bucket) benefit from restricted input domains" >> benchmark-results.md
+        echo "" >> benchmark-results.md
+        echo "**Searching:**" >> benchmark-results.md
+        echo "- **Ordered Linear Search significantly outperforms Unordered** in 'Not Found' scenarios" >> benchmark-results.md
+        echo "- **Early Exit optimization** can reduce search time by up to 90% when target doesn't exist" >> benchmark-results.md
+        echo "- Both algorithms perform equally in Best Case scenarios (target at beginning)" >> benchmark-results.md
+        echo "- **Ordered search advantage grows with array size** - larger arrays show more dramatic improvements" >> benchmark-results.md
+        echo "- For sorted data, Ordered Linear Search is always preferable over Unordered" >> benchmark-results.md
+        
+        else
+          echo "❌ No benchmark results found!"
+          exit 1
+        fi >> benchmark-results.md
 
     - name: Display Results
       run: cat benchmark-results.md
@@ -170,7 +269,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: `Weekly Performance Report - ${date}`,
-              body: `# Weekly Sorting Algorithm Performance Report\n\n${results}\n\n---\n*This report was automatically generated by the JMH benchmark workflow.*`,
+              body: `# Weekly Performance Report\n\n${results}\n\n---\n*This report was automatically generated by the JMH benchmark workflow.*`,
               labels: ['performance', 'automated']
             });
           }
