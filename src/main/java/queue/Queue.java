@@ -37,6 +37,13 @@ public class Queue {
         return value;
     }
 
+    public int peek() {
+        if (size == 0) {
+            throw new IllegalStateException("Queue is empty");
+        }
+        return array[front];
+    }
+
     public boolean isEmpty() {
         return size == 0;
     }

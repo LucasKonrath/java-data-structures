@@ -65,10 +65,16 @@ echo ""
 echo "Select benchmark to run:"
 echo "1) Sorting algorithms"
 echo "2) Searching algorithms"
-echo "3) All benchmarks"
-echo "4) Exit"
+echo "3) Heap operations"
+echo "4) Linked List operations"
+echo "5) Queue operations"
+echo "6) Stack operations"
+echo "7) Tree operations"
+echo "8) Disjoint Set operations"
+echo "9) All data structures"
+echo "10) Exit"
 
-read -p "Enter your choice (1-4): " choice
+read -p "Enter your choice (1-10): " choice
 
 case $choice in
     1)
@@ -78,10 +84,34 @@ case $choice in
         run_benchmark "searching" ".*SearchingBenchmark.*" "Searching Algorithm Benchmarks"
         ;;
     3)
-        run_benchmark "sorting" ".*SortingBenchmark.*" "Sorting Algorithm Benchmarks"
-        run_benchmark "searching" ".*SearchingBenchmark.*" "Searching Algorithm Benchmarks"
+        run_benchmark "heap" ".*HeapBenchmark.*" "Heap Operation Benchmarks"
         ;;
     4)
+        run_benchmark "linkedlist" ".*LinkedListBenchmark.*" "Linked List Operation Benchmarks"
+        ;;
+    5)
+        run_benchmark "queue" ".*QueueBenchmark.*" "Queue Operation Benchmarks"
+        ;;
+    6)
+        run_benchmark "stack" ".*StackBenchmark.*" "Stack Operation Benchmarks"
+        ;;
+    7)
+        run_benchmark "tree" ".*TreeBenchmark.*" "Tree Operation Benchmarks"
+        ;;
+    8)
+        run_benchmark "disjointset" ".*DisjointSetBenchmark.*" "Disjoint Set Operation Benchmarks"
+        ;;
+    9)
+        run_benchmark "sorting" ".*SortingBenchmark.*" "Sorting Algorithm Benchmarks"
+        run_benchmark "searching" ".*SearchingBenchmark.*" "Searching Algorithm Benchmarks"
+        run_benchmark "heap" ".*HeapBenchmark.*" "Heap Operation Benchmarks"
+        run_benchmark "linkedlist" ".*LinkedListBenchmark.*" "Linked List Operation Benchmarks"
+        run_benchmark "queue" ".*QueueBenchmark.*" "Queue Operation Benchmarks"
+        run_benchmark "stack" ".*StackBenchmark.*" "Stack Operation Benchmarks"
+        run_benchmark "tree" ".*TreeBenchmark.*" "Tree Operation Benchmarks"
+        run_benchmark "disjointset" ".*DisjointSetBenchmark.*" "Disjoint Set Operation Benchmarks"
+        ;;
+    10)
         echo "👋 Goodbye!"
         exit 0
         ;;

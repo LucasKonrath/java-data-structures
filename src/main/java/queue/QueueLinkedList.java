@@ -43,6 +43,10 @@ public class QueueLinkedList {
         return front.getData();
     }
 
+    public int peek() {
+        return first();
+    }
+
     public boolean isEmpty() {
         return length == 0;
     }
