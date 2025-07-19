@@ -44,18 +44,27 @@ jobs:
 
     - name: Run JMH Benchmarks
       run: |
-        # Run both sorting and searching benchmarks
+        # Run all data structure benchmarks
         java -jar target/benchmarks.jar ".*SortingBenchmark.*" -rf json -rff target/sorting-results.json
         java -jar target/benchmarks.jar ".*SearchingBenchmark.*" -rf json -rff target/searching-results.json
+        java -jar target/benchmarks.jar ".*HeapBenchmark.*" -rf json -rff target/heap-results.json
+        java -jar target/benchmarks.jar ".*LinkedListBenchmark.*" -rf json -rff target/linkedlist-results.json
+        java -jar target/benchmarks.jar ".*QueueBenchmark.*" -rf json -rff target/queue-results.json
+        java -jar target/benchmarks.jar ".*StackBenchmark.*" -rf json -rff target/stack-results.json
+        java -jar target/benchmarks.jar ".*TreeBenchmark.*" -rf json -rff target/tree-results.json
+        java -jar target/benchmarks.jar ".*DisjointSetBenchmark.*" -rf json -rff target/disjointset-results.json
         
-        # Combine results into a single file
+        # Combine all results into a single file
         echo "[]" > target/jmh-results.json
-        if [ -f target/sorting-results.json ] && [ -f target/searching-results.json ]; then
-          jq -s '.[0] + .[1]' target/sorting-results.json target/searching-results.json > target/jmh-results.json
-        elif [ -f target/sorting-results.json ]; then
-          cp target/sorting-results.json target/jmh-results.json
-        elif [ -f target/searching-results.json ]; then
-          cp target/searching-results.json target/jmh-results.json
+        result_files=""
+        for file in target/*-results.json; do
+          if [ -f "$file" ]; then
+            result_files="$result_files $file"
+          fi
+        done
+        
+        if [ -n "$result_files" ]; then
+          jq -s 'add' $result_files > target/jmh-results.json
         fi
 
     - name: Parse and Format Benchmark Results
