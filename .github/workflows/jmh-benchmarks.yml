@@ -114,14 +114,16 @@ jobs:
         echo "- **Tree Sort**: O(n log n) average, O(n²) worst - BST-based sorting with duplicate handling" >> benchmark-results.md
         echo "- **Counting Sort**: O(n + k) - Linear time for limited range integers (k = range)" >> benchmark-results.md
         echo "- **Bucket Sort**: O(n + k) - Linear time for limited range (0-9), uses counting buckets" >> benchmark-results.md
+        echo "- **Radix Sort**: O(d × (n + k)) - Linear time, d = digits, k = base (10)" >> benchmark-results.md
         echo "" >> benchmark-results.md
         echo "**Key Observations:**" >> benchmark-results.md
-        echo "- Bucket Sort and Counting Sort should be fastest for arrays with small integer ranges (0-9)" >> benchmark-results.md
+        echo "- Linear-time algorithms (Radix, Bucket, Counting Sort) should be fastest for suitable integer ranges" >> benchmark-results.md
+        echo "- Radix Sort excels with multi-digit numbers while maintaining linear complexity" >> benchmark-results.md
         echo "- Merge Sort and Quick Sort should perform best on large datasets due to O(n log n) complexity" >> benchmark-results.md
         echo "- Insertion Sort may outperform others on small, nearly-sorted datasets" >> benchmark-results.md
         echo "- Bubble Sort typically shows the worst performance on random data" >> benchmark-results.md
         echo "- Tree Sort performance depends on BST balance and duplicate frequency" >> benchmark-results.md
-        echo "- Linear-time algorithms (Bucket/Counting Sort) benefit from restricted input ranges" >> benchmark-results.md
+        echo "- Non-comparison algorithms (Radix/Counting/Bucket) benefit from restricted input domains" >> benchmark-results.md
 
     - name: Display Results
       run: cat benchmark-results.md
