@@ -33,6 +33,7 @@ public class SortingBenchmark {
     private TreeSort treeSort;
     private CountingSort countingSort;
     private BucketSort bucketSort;
+    private RadixSort radixSort;
 
     @Setup(Level.Trial)
     public void setUp() {
@@ -52,6 +53,7 @@ public class SortingBenchmark {
         treeSort = new TreeSort();
         countingSort = new CountingSort();
         bucketSort = new BucketSort();
+        radixSort = new RadixSort();
     }
 
     // Small Array Benchmarks (100 elements)
@@ -110,6 +112,12 @@ public class SortingBenchmark {
         bucketSort.sort(arr);
     }
 
+    @Benchmark
+    public void radixSortSmall() {
+        int[] arr = smallArray.clone();
+        radixSort.radixSort(arr);
+    }
+
     // Medium Array Benchmarks (1,000 elements)
 
     @Benchmark
@@ -166,6 +174,12 @@ public class SortingBenchmark {
         bucketSort.sort(arr);
     }
 
+    @Benchmark
+    public void radixSortMedium() {
+        int[] arr = mediumArray.clone();
+        radixSort.radixSort(arr);
+    }
+
     // Large Array Benchmarks (10,000 elements)
 
     @Benchmark
@@ -220,6 +234,12 @@ public class SortingBenchmark {
     public void bucketSortLarge() {
         int[] arr = largeArray.clone();
         bucketSort.sort(arr);
+    }
+
+    @Benchmark
+    public void radixSortLarge() {
+        int[] arr = largeArray.clone();
+        radixSort.radixSort(arr);
     }
     // Main method to run benchmarks directly
     public static void main(String[] args) throws RunnerException {
