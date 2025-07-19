@@ -32,14 +32,17 @@ public class SortingBenchmark {
     private ShellSort shellSort;
     private TreeSort treeSort;
     private CountingSort countingSort;
+    private BucketSort bucketSort;
 
     @Setup(Level.Trial)
     public void setUp() {
         Random random = new Random(42); // Fixed seed for reproducible results
 
-        smallArray = random.ints(SMALL_ARRAY_SIZE, 0, 1000).toArray();
-        mediumArray = random.ints(MEDIUM_ARRAY_SIZE, 0, 1000).toArray();
-        largeArray = random.ints(LARGE_ARRAY_SIZE, 0, 1000).toArray();
+        // Note: BucketSort only works with values 0-9, so we generate arrays in that range
+        // Other algorithms will still work with this range
+        smallArray = random.ints(SMALL_ARRAY_SIZE, 0, 10).toArray();
+        mediumArray = random.ints(MEDIUM_ARRAY_SIZE, 0, 10).toArray();
+        largeArray = random.ints(LARGE_ARRAY_SIZE, 0, 10).toArray();
 
         bubbleSort = new BubbleSort();
         insertionSort = new InsertionSort();
@@ -48,6 +51,7 @@ public class SortingBenchmark {
         shellSort = new ShellSort();
         treeSort = new TreeSort();
         countingSort = new CountingSort();
+        bucketSort = new BucketSort();
     }
 
     // Small Array Benchmarks (100 elements)
@@ -100,6 +104,12 @@ public class SortingBenchmark {
         countingSort.countingSort(arr);
     }
 
+    @Benchmark
+    public void bucketSortSmall() {
+        int[] arr = smallArray.clone();
+        bucketSort.sort(arr);
+    }
+
     // Medium Array Benchmarks (1,000 elements)
 
     @Benchmark
@@ -150,6 +160,12 @@ public class SortingBenchmark {
         countingSort.countingSort(arr);
     }
 
+    @Benchmark
+    public void bucketSortMedium() {
+        int[] arr = mediumArray.clone();
+        bucketSort.sort(arr);
+    }
+
     // Large Array Benchmarks (10,000 elements)
 
     @Benchmark
@@ -198,6 +214,12 @@ public class SortingBenchmark {
     public void countingSortLarge() {
         int[] arr = largeArray.clone();
         countingSort.countingSort(arr);
+    }
+
+    @Benchmark
+    public void bucketSortLarge() {
+        int[] arr = largeArray.clone();
+        bucketSort.sort(arr);
     }
     // Main method to run benchmarks directly
     public static void main(String[] args) throws RunnerException {
