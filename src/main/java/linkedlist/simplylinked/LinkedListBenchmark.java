@@ -21,35 +21,12 @@ public class LinkedListBenchmark {
     private static final int MEDIUM_SIZE = 1000;
     private static final int LARGE_SIZE = 10000;
 
-    private SimplyLinkedList smallList;
-    private SimplyLinkedList mediumList;
-    private SimplyLinkedList largeList;
-
     private int[] testData;
-    private Random random;
 
     @Setup(Level.Trial)
     public void setUp() {
-        random = new Random(42);
+        Random random = new Random(42);
         testData = random.ints(LARGE_SIZE, 0, 10000).toArray();
-    }
-
-    @Setup(Level.Invocation)
-    public void setUpLists() {
-        smallList = new SimplyLinkedList();
-        mediumList = new SimplyLinkedList();
-        largeList = new SimplyLinkedList();
-
-        // Pre-populate lists for certain benchmarks
-        for (int i = 0; i < SMALL_SIZE; i++) {
-            smallList.insertAtBeginning(testData[i]);
-        }
-        for (int i = 0; i < MEDIUM_SIZE; i++) {
-            mediumList.insertAtBeginning(testData[i]);
-        }
-        for (int i = 0; i < LARGE_SIZE; i++) {
-            largeList.insertAtBeginning(testData[i]);
-        }
     }
 
     // Insertion at Beginning Benchmarks
@@ -127,98 +104,108 @@ public class LinkedListBenchmark {
         }
     }
 
-    // Search Benchmarks
+    // Traversal Benchmarks (since search/delete methods don't exist)
+    @Benchmark
+    public int traverseSmall() {
+        SimplyLinkedList list = new SimplyLinkedList();
+        for (int i = 0; i < SMALL_SIZE; i++) {
+            list.insertAtEnd(testData[i]);
+        }
+
+        int count = 0;
+        LinkedListNode current = list.getHead();
+        while (current != null) {
+            count += current.getData(); // Process the data to prevent dead code elimination
+            current = current.getNext();
+        }
+        return count;
+    }
+
+    @Benchmark
+    public int traverseMedium() {
+        SimplyLinkedList list = new SimplyLinkedList();
+        for (int i = 0; i < MEDIUM_SIZE; i++) {
+            list.insertAtEnd(testData[i]);
+        }
+
+        int count = 0;
+        LinkedListNode current = list.getHead();
+        while (current != null) {
+            count += current.getData();
+            current = current.getNext();
+        }
+        return count;
+    }
+
+    @Benchmark
+    public int traverseLarge() {
+        SimplyLinkedList list = new SimplyLinkedList();
+        for (int i = 0; i < LARGE_SIZE; i++) {
+            list.insertAtEnd(testData[i]);
+        }
+
+        int count = 0;
+        LinkedListNode current = list.getHead();
+        while (current != null) {
+            count += current.getData();
+            current = current.getNext();
+        }
+        return count;
+    }
+
+    // Linear Search Benchmarks (implemented manually since search() doesn't exist)
     @Benchmark
     public boolean searchSmall() {
-        return smallList.search(testData[SMALL_SIZE / 2]);
+        SimplyLinkedList list = new SimplyLinkedList();
+        for (int i = 0; i < SMALL_SIZE; i++) {
+            list.insertAtEnd(testData[i]);
+        }
+
+        int target = testData[SMALL_SIZE / 2];
+        LinkedListNode current = list.getHead();
+        while (current != null) {
+            if (current.getData() == target) {
+                return true;
+            }
+            current = current.getNext();
+        }
+        return false;
     }
 
     @Benchmark
     public boolean searchMedium() {
-        return mediumList.search(testData[MEDIUM_SIZE / 2]);
+        SimplyLinkedList list = new SimplyLinkedList();
+        for (int i = 0; i < MEDIUM_SIZE; i++) {
+            list.insertAtEnd(testData[i]);
+        }
+
+        int target = testData[MEDIUM_SIZE / 2];
+        LinkedListNode current = list.getHead();
+        while (current != null) {
+            if (current.getData() == target) {
+                return true;
+            }
+            current = current.getNext();
+        }
+        return false;
     }
 
     @Benchmark
     public boolean searchLarge() {
-        return largeList.search(testData[LARGE_SIZE / 2]);
-    }
-
-    // Deletion Benchmarks
-    @Benchmark
-    public void deleteFromBeginningSmall() {
-        SimplyLinkedList list = new SimplyLinkedList();
-        for (int i = 0; i < SMALL_SIZE; i++) {
-            list.insertAtBeginning(testData[i]);
-        }
-        for (int i = 0; i < SMALL_SIZE / 2; i++) {
-            list.deleteFromBeginning();
-        }
-    }
-
-    @Benchmark
-    public void deleteFromBeginningMedium() {
-        SimplyLinkedList list = new SimplyLinkedList();
-        for (int i = 0; i < MEDIUM_SIZE; i++) {
-            list.insertAtBeginning(testData[i]);
-        }
-        for (int i = 0; i < MEDIUM_SIZE / 2; i++) {
-            list.deleteFromBeginning();
-        }
-    }
-
-    @Benchmark
-    public void deleteFromBeginningLarge() {
         SimplyLinkedList list = new SimplyLinkedList();
         for (int i = 0; i < LARGE_SIZE; i++) {
-            list.insertAtBeginning(testData[i]);
+            list.insertAtEnd(testData[i]);
         }
-        for (int i = 0; i < LARGE_SIZE / 2; i++) {
-            list.deleteFromBeginning();
-        }
-    }
 
-    // Get Length Benchmarks
-    @Benchmark
-    public int getLengthSmall() {
-        return smallList.getLength();
-    }
-
-    @Benchmark
-    public int getLengthMedium() {
-        return mediumList.getLength();
-    }
-
-    @Benchmark
-    public int getLengthLarge() {
-        return largeList.getLength();
-    }
-
-    // Traversal Benchmarks
-    @Benchmark
-    public void traverseSmall() {
-        LinkedListNode current = smallList.getHead();
+        int target = testData[LARGE_SIZE / 2];
+        LinkedListNode current = list.getHead();
         while (current != null) {
-            current.getData(); // Access the data
+            if (current.getData() == target) {
+                return true;
+            }
             current = current.getNext();
         }
-    }
-
-    @Benchmark
-    public void traverseMedium() {
-        LinkedListNode current = mediumList.getHead();
-        while (current != null) {
-            current.getData(); // Access the data
-            current = current.getNext();
-        }
-    }
-
-    @Benchmark
-    public void traverseLarge() {
-        LinkedListNode current = largeList.getHead();
-        while (current != null) {
-            current.getData(); // Access the data
-            current = current.getNext();
-        }
+        return false;
     }
 
     public static void main(String[] args) throws RunnerException {
