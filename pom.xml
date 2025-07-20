@@ -131,6 +131,9 @@
                         <exclude>**/jmh_generated/**</exclude>
                         <exclude>**/*_jmhTest.class</exclude>
                         <exclude>**/*_jmhType*.class</exclude>
+                        <!-- Exclude all benchmark classes from coverage -->
+                        <exclude>**/*Benchmark.class</exclude>
+                        <exclude>**/benchmarks/**</exclude>
                     </excludes>
                     <rules>
                         <rule>
